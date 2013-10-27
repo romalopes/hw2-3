@@ -4,6 +4,13 @@ MongoDB Course. Home work 2.3
 - MongoDB Course
 	Info:
 		https://education.mongodb.com/courses/10gen/M101J
+	Using Maven
+		to run the project: mvn compile exec:java -Dexec.mainClass=course.BlogController
+		to test: mvn test
+	Using Gradle
+	    to rum the project: gradle run
+	    to test: gradle test
+
 		- 7 weeks
 	- Week 1
 		- Suports
@@ -248,7 +255,7 @@ MongoDB Course. Home work 2.3
 			View - ftl - freemarker
 			controller/model java/spark.
 
-		- Home Work
+		- Home Work -
 			1 - db.grades.find({score:{$gte:65}}).sort( { score : 1 } ).limit(1)
 			2 - 124
 			3 - fhj837hf9376hgf93hf832jf9

@@ -104,7 +104,7 @@ public class UserDAOTest
 
     }
 
-    public void testAddUserWithRunningServer() throws IOException, InterruptedException {
+    public void estAddUserWithRunningServer() throws IOException, InterruptedException {
 
         assertTrue( true );
         // Run a java app in a separate system process

@@ -7,9 +7,9 @@ def gitIgnoreDirs = gitIgnore*.trim().findAll { !it.startsWith("#") && it.endsWi
 idea {
   project {
     jdkName "1.6"
-    configure(modules) {
-      excludeDirs = files(gitIgnoreDirs) as Set
-    }
+//    configure(modules) {
+//      excludeDirs = files(gitIgnoreDirs) as Set
+//    }
     ipr {
       withXml { provider ->
         def node = provider.asNode()
