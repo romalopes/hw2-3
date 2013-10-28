@@ -1,17 +1,33 @@
-MongoDB Course. Home work 2.3
+MongoDB Course. Home work 
 =============================
+
+GitHub on
+https://github.com/romalopes/hw2-3
 
 - MongoDB Course
 	Info:
-		https://education.mongodb.com/courses/10gen/M101J
+		https://education.mongodb.com/courses
+		Lenght of course: - 7 weeks
 	Using Maven
 		to run the project: mvn compile exec:java -Dexec.mainClass=course.BlogController
 		to test: mvn test
 	Using Gradle
 	    to rum the project: gradle run
 	    to test: gradle test
+	
+	To create a project with gradle
+		- copy the directory Gradle to root
+			- gradle
+				wrapper
+					gradle-wrapper.jar
+					gradle-wrapper.properties
+				ide.gradle
+		- copy the btch file to root
+			gradlew (for X)
+			gradle.bat ( for windows)
+		- copy settings.gradle to root
+			Only this inside: rootProject.name = "NAME PROJECT"
 
-		- 7 weeks
 	- Week 1
 		- Suports
 			Based on Json Documents(key, values). It is a document database
@@ -260,3 +276,12 @@ MongoDB Course. Home work 2.3
 			2 - 124
 			3 - fhj837hf9376hgf93hf832jf9
 	- Week 3
+		- MongoDB Schema Design
+			Application-Driven Schema
+			. Features
+				Rich Documents
+				Pre join data for fast access
+				No Joing
+				No Constraina like MySql
+				Atomic operations(no transactions)
+				No Declared Schema
