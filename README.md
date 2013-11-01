@@ -1,34 +1,24 @@
+
+
 MongoDB Course. Home work 
 =============================
 
-GitHub on
-https://github.com/romalopes/hw2-3
 
 - MongoDB Course
-	Info:
-		https://education.mongodb.com/courses
-		Lenght of course: - 7 weeks
-	Using Maven
-		to run the project: mvn compile exec:java -Dexec.mainClass=course.BlogController
-		to test: mvn test
-	Using Gradle
-	    to rum the project: gradle run
-	    to test: gradle test
-	
-	To create a project with gradle
-		- copy the directory Gradle to root
-			- gradle
-				wrapper
-					gradle-wrapper.jar
-					gradle-wrapper.properties
-				ide.gradle
-		- copy the btch file to root
-			gradlew (for X)
-			gradle.bat ( for windows)
-		- copy settings.gradle to root
-			Only this inside: rootProject.name = "NAME PROJECT"
+	General Info
+		Info:
+			https://education.mongodb.com/courses
+			Lenght of course: - 7 weeks
+		Using Maven
+			to run the project: mvn compile exec:java -Dexec.mainClass=course.BlogController
+			to test: mvn test
+		Using Gradle
+			to rum the project: gradle run
+			to test: gradle test
+		GitHub on
+			https://github.com/romalopes/hw2-3
 
-	- Week 1
+	- Week 1 - Introduction
 		- Suports
 			Based on Json Documents(key, values). It is a document database
 			In same document Dynamic Schema.  Different collections of data.
@@ -71,6 +61,10 @@ https://github.com/romalopes/hw2-3
 			Types of Data
 				- Array -> list of items	-> [...]
 				- Dictionaries ->associative maps  {key:value} -> {name:"value",city:"value", interests:[ ___, ___, ___]
+		- import Bson
+			mongorestore -d dbname -c collectionname dir/file.bson
+		- import Json
+			mongoimport --collection NAME --file NAME.
 		- Embeded data into documents
 			If the embeded data exceed 16Mb, because each document should have the maximum of 16Mb
 		Home Work:
@@ -78,7 +72,7 @@ https://github.com/romalopes/hw2-3
 			2- 2,3,5
 			3-366
 			4- 2805
-	- Week 2
+	- Week 2 - CRUD
 		- CRUD
 			Create=Insert.  Read=Find.  Update=Update.  Delete=Remove
 			Does not have a language such as SQL.
@@ -270,12 +264,36 @@ https://github.com/romalopes/hw2-3
 		- About blog
 			View - ftl - freemarker
 			controller/model java/spark.
-
-		- Home Work -
+			db.post.insert(
+			db.post.insert( 
+				{ "author": "Anderson", 
+				  "body": "Body", 
+				  "title":"title",
+				  "comments" : [
+					{
+						"body": "comment1",
+						"email": "email",
+						"author": "author1"
+					},
+					{
+						"body": "comment2",
+						"email": "emai2",
+						"author": "author2"
+					}
+				  ],
+				  "date": ISOData("2012-11-07;47:22),
+				  "permalink": "link of post",
+				  "tags": [
+						"tag1",
+						"tag2",
+						"tag3"
+				  ]
+				 }
+		- Home Work
 			1 - db.grades.find({score:{$gte:65}}).sort( { score : 1 } ).limit(1)
 			2 - 124
 			3 - fhj837hf9376hgf93hf832jf9
-	- Week 3
+	- Week 3 - Schema Design
 		- MongoDB Schema Design
 			Application-Driven Schema
 			. Features
@@ -285,3 +303,314 @@ https://github.com/romalopes/hw2-3
 				No Constraina like MySql
 				Atomic operations(no transactions)
 				No Declared Schema
+		- MongoDB does not have
+			- Foreign key Constraints - Constrains should be guaranteed by application.
+			- Transaction
+		- MongoDB works with Atomic Operations
+			- All the changes you make will be finished before anyone sees the document.
+			3 aproaches
+				- Reestructure the document to put everything in ONE document
+				- Implement Software Locking.
+				- Tolerate the inconsistancy.  Sometimes there is no problem if some client wait some time to see the updated value.
+		- One to One Relations(1:1)
+			Each item correspond to exactly one other item.
+			Ex:
+				Employee 	--------- 	Resume
+				_id:20					_id:30		
+				name:"Anderson"			jobs: [		]
+				resume:30				education: [		]
+										employee: 20
+			One item can be embebed in another.  It depends on:
+				- Frequency of access: If you access only one and rarely another, it is better to make separately.
+				   If put embebed, it will be costy to ready too much data unnecessary.
+				- Size of Items: It one element increase too much, it is better to separate them. Max of each document is 16Mb.
+				- Atomicity of data: All atomic operations are in a single document. 
+					If you want to save all data together, it is better to put them in the same document.
+		- One to Many
+			Each item can be related to many items from another collection
+			Ex:
+				City	--------	People
+				(_id:"NYC"			{name: "Anderson",
+				...}				city: "NYC"}
+			It is call one to few if the collection(many) is put inside the first collection;
+			Ex:
+				Post
+				{name:"post",
+				 comments:
+				       [C1, C2]
+				}
+		- Many to Many
+			Many items can be related to many items from another collection
+			Also has the concept of few to few when it is better to embeded one of the collections.  It is bad because it usually creates replication.
+			Ex:
+				Books 		------			Authors
+				{_id:12,					{_id:14,
+				title:"Name of book"		author_name:"name",
+				authors:[12,14]}			books: [12,13]}
+		- Multikey indexes
+			Create indexes to make easier to find a element
+			Ex:
+				students
+				{_id:0, "name":"A", teachers:[1,2,3]}
+				teachers
+				{_id:0, "name":"T"}  //without the relation to students
+				db.students.ensureIndex({teachers:1})  //It is specifying that teacher is indexed in students.
+				The find.
+				db.students.find('teachers':{'$all',[1,3]}) // return all students that have teachers 1,3
+				db.students.find('teachers':{'$all',[1,3]}).explain() //shows if there is a index(in cursor)
+		- Benefits of Embedding 
+			- Read performance with just one round trip to the DB.
+			- Remenber the Normalization and a collection can't have more than 16Mb
+		- Representing a tree.  Simple, just like a tree in data structure.
+			- Ex: Representing categories of ecommerce
+			Product		-----------		Category
+			category:7					_id: 7
+			name:"Name Produ"			name:"Name Cat"
+										parent:6  OR ancestors:[1,2,3]
+			Ex:
+			
+			{
+			  _id: 34,
+			  name : "Snorkeling",
+			  parent_id: 12,
+			  ancestors: [12, 35, 90]
+			}
+			Get all the decendants of this category
+			db.categories.find({ancestors:34})  //Returns all the categories that has an ancestors == 34 in its array
+			Get all the ancestors of this category
+			db.categories.find({_id:{'$in':[12,35,90]}}) //Returns all the categories where that _id is in this array
+		- When to denormalize
+			------- To improve the performance.
+			1:1 Embed
+				When you don't duplicate(too much)
+			1:Many Embed
+				When you see one to may and there is no duplication.
+			many:many Link
+		- How to store large files(GF) with more than 16Mb or blob
+			Put them in 2 collections
+				- 1. Create a "chuncks" colection. In each document of this collection, put 16Mb of the large file.
+					Similiar with old ARJ that each part has a limit to put in the disk
+					Plus include a file ID refering to the file collection
+				- 2. A file collection that represent the information about file.
+			Ex:
+				DB database = client.getDB("course");
+				FileInputStream inputStream = null;
+				GridFS videos = new GridFS(database, "videos);
+				try {
+					inputStream = new FileInputStream("video.mp4");
+				}catch(...){...}
+				GridFSInputFile video = video.createFile(inputStream, "video.mp4"); //name can be different from inputStream
+				BasicDBObject mata = new BasicDBObject("description", "Vídeo name");
+				ArrayList<String> tags = new ArrayList<~>();
+				tags.add("Some Tags);
+				meta.append("tags",tags);
+				video.setMedaData(meta)
+				video.save();
+			- It is created the two collections files and chuncks with all information about file.
+				try: db.course.file.find()  and db.course.chuncks({}, {data:0})
+			reference: api.mongodb.org/java/current/  package com.mongodb.gridf
+				
+				....  To finde the file
+				GridFSDBFile gridFile = videos.findOne(new BasicDBObject("filename", "video.mp4");
+				FileOutputStream outputSream = new FileOutputStream("video_copy.mp4");
+				gridFile.writeTo(outputStream);
+		- SideBar: Importing  from a twitter feed
+			https://api.twitter.com/1/statuses/user_timeline.json?screen_name=MongoDB?include_rts=1
+			Returns the following error because it seems to be deprecated:
+			{"errors": [{"message": "The Twitter REST API v1 is no longer active. Please migrate to API v1.1. https://dev.twitter.com/docs/api/1.1/overview.", "code": 68}]}
+		
+			I run :
+			https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=MongoDB?include_rts=1
+			Error: {"errors":[{"message":"Bad Authentication data","code":215}]}
+			Needs authentication.
+		- Home Work
+			1 - 
+			2 - 
+
+	- Week 4 - Performance (indexes, multiple servers)
+		- Index	Concepts
+			http://docs.mongodb.org/manual/core/indexes-introduction/
+			Used to keep the keys ordered. It is costy, take space on disk.  Small percentage 
+			With a database too big, it is necessary to go through the entire collection
+			Query need to scan the collection.
+			Ex: (name, hair_color, date_birth). Order first name, after hair_color, ...
+			To use the index (a,b,c)
+							b - No.
+							a - Yes
+							c - No
+							a,b - Yes
+							a,c - Yes, but just use the index from a.
+		Types
+			Defauld_id
+				Used by _id. Always exists
+			Single Field
+				An user-defined index on a single field of docuemnt
+				http://docs.mongodb.org/master/_images/index-ascending.png
+				ex: {score:1}
+			Compound Index
+				When the index is composed by more than one field
+				http://docs.mongodb.org/master/_images/index-compound-key.png
+				ex: {userid:1. score:-1}
+			Multikey index
+				When the index is composed by elements in different levels and the lower level is an array.
+				http://docs.mongodb.org/master/_images/index-multikey.png
+				ex: {"adr.zip", 1} // {"adr": [ {zip:1111, ...}, {zip:2222,...}]}
+			Geospatial Index
+				An index that uses planar geometry that use spherical geometry to return results.
+				http://docs.mongodb.org/manual/applications/geospatial-indexes/
+			Text index
+				Supports text
+			Hashed Index
+				Indexes the hash of the value of a field
+
+
+		How to create indexes
+			db.students.find({"student_id": 500000})
+			db.students.ensureIndex({"student_id": 1, "type": -1})  
+			//student_id ascendent and type is descendent.
+			//It takes time to create.
+			db.students.find({"student_id": 500000})
+		How to find
+			db.system.indexes.find()   --> list the indexes
+			db.students.getIndexes()   --> list all indexes from one DB.
+		Remove Index
+			db.students.dropIndex({"student_id":1})
+		Multikey indexes
+			When the is a document with a array.
+			Creates a index not only for the array, but will create a index point for each item of the array.
+			EX:
+				use test
+				db.bbb.insert({a:1,b:1})	
+				db.bbb.ensureIndex({a:1,b:1}, {unique:true})	//Both ascendent
+				db.bbb.insert({a:[1,2,3],b:1})	
+				db.bbb.insert({a:5,b:[1,2,3]})	
+				db.bbb.getIndexes()
+				db.bbb.insert({a:[1,2,3],b:[1,2,3]})	
+					cannot index parallel arrays [b]  [a]
+			instead of unique, can do dropDrup  -> Remove all duplicated elements except one.  This is very dangerous.
+
+		Multi-level
+			A index can be multi-level and can start inside a collection
+			Ex: 
+				db.student.address.phone.type
+				db.student.ensureIndex({"phone.type",1}, 'unique': true)
+				db.students.ensureIndex({ student_id:1, class_id:1})
+		Index when an entry key is missing
+			Ex: {a:1, b:1, c:1}
+				{a:2, b:3}	 c = null
+				{a:4, b:5}   c = null 		Only the first document is indexed.
+			It is a sparse Index
+				db.test.ensureIndex({c:1}, {unique: true, sparse:true})
+			if a call: db.test.find().sort({'c':1}) //will return only one document due to the index.
+		Types of indexes: Foreground/background
+			Foreground
+				Default on mongo DB
+				block all the writers 
+				fast
+			Background
+				slower
+				does not block the writers
+				Can create many index at time per database.
+				Better in production.  
+				Better in replicated system.
+		Explain
+			Explain what the command does.
+			db.students().find().explain()
+		When is an index used?
+			db.students.stats()   // stats about a collection
+			db.students.totalIndexSize() //size of a indexes
+			It is more important that the INDEX than data fit into memory.
+		Index Cardinality
+			Regular
+				1:1
+			Sparse
+				number of index point<= document
+			Multikey
+				at least one value in a document that is a array.
+				tags:[__, __, __]
+				index Points > documents
+		How to tell mongoDB what index to use
+			db.students.find().hint({a:1, b:1})
+
+			db.students.find().hint({"$natural:1"})  //use no index
+		Using Hint in Java
+			MongoClient client = new MongoClient();
+			DB db - client.getDB("test");
+			BasicDBObject query = new BasicDBObject("a", 40000);
+			query.append("b", 400000);
+			query.append("c", 400000);
+
+			DBCollection c = dbgetCollection("foo");
+			DBObject doc = c.find(query).hint("a_1_b-1_c1").explain();
+			OR
+			BasicDBObject myHint = new BasicDBObject("a",1).append("b",-1).append("c",1);
+			DbObject doc = c.find(query).hint(myHint).explain();
+			System.out.println (doc);
+		Efficiency of index Use
+			Index are inefficient in some cases.
+			For some operators such as $gt, $lt because the cursor can go though half of collection
+			$ne,Regex - have to go thoght all the index.
+			ex: db.collection.find({value:{"$gt",100}}, class_id:20);
+		Geospatial Indexes ("2D")
+			XY -> 2D
+			To have information, the document should have a location x,y
+			ex: 'location':[x,y]
+			ensureIndex({ "location":'2d', type:1})  
+
+			find({location:{$near:[x,y]}}).limit(20) //return the 20th nearest elements 
+			
+			Geospatial Spheral
+				Consider the shape of earth(curvature, spherial model).
+				Use Lat x long "radiandos"
+				db.runCommand({geoNear: 'stores', near:[50,50], spherical:true, maxDistance:3})
+				//maxDistance is in "radiandos"
+			Loggind Slow Queries
+				Loggind
+					Queries above 100ms texts a log
+					It is shown in the screen of mongod (server)
+				Profiler
+					3 levels in System.profile
+					- 0 - OFF. Do not log any query (Default)
+					- 1 - Log only slow queries
+					- 2 - Log all queries. (good for Debuging)
+					It is defined when starts the server
+						mongod --profile 1 --slows 2 (2miliseconds)
+					To commands the profiles logged
+						db.getProfilingLevel()
+						db.setProfilingStatus()
+						db.setProfilingLevel(1,4) //level, time in miliseconds
+						db.system.profile.find().prety()
+						db.system.profile.find({ns:/school.students/").sort({ts:1}).prety()
+											//Query 				//time stamp
+
+						quiz:
+						Write the query to look in the system profile collection for all queries that took longer than one second, ordered by timestamp descending.
+							db.system.profile.find({millis:{"$gt",1000}}).sort({ts:-1})
+			Mongotop
+				similar to unix "top"
+				command line: $ mongotop 3.  //Stops each 3 second.
+			Mongostat
+				based on iostat
+				Shows the statitics about mongod running.
+			Sharding
+				Used to split up a large collection among multiple servers.
+				Shards deploys multiples servers.  
+				APPLICATION connects to a MONGOS that connects to many MONGOD
+				Usually application is in the same server as mongoS.
+				On shard can have many mongod that are called ReplicaSets
+				Insert: Must include the shard key.
+				Update/Remove/find: If doesn't pass the shardkey, the command is broadcasted to all mongod.
+
+
+
+
+
+
+but://www.gradle.org/docs/current/userguide/userguide_single.html#overview
+Cap 8
+http://spring.io/docs
+http://spring.io/guides
+http://spring.io/guides/gs/securing-web/
+http://docs.spring.io/spring-social/docs/current/reference/htmlsingle/
+http://docs.spring.io/spring-social-twitter/docs/1.0.5.RELEASE/reference/htmlsingle/
+http://docs.spring.io/spring-social-facebook/docs/current/reference/htmlsingle/					
