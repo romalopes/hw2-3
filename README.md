@@ -556,7 +556,6 @@ MongoDB Course. Home work
 			To have information, the document should have a location x,y
 			ex: 'location':[x,y]
 			ensureIndex({ "location":'2d', type:1})  
-
 			find({location:{$near:[x,y]}}).limit(20) //return the 20th nearest elements 
 			
 			Geospatial Spheral
@@ -600,6 +599,9 @@ MongoDB Course. Home work
 				On shard can have many mongod that are called ReplicaSets
 				Insert: Must include the shard key.
 				Update/Remove/find: If doesn't pass the shardkey, the command is broadcasted to all mongod.
+
+
+
 
 
 
